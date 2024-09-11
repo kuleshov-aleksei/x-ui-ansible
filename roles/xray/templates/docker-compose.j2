@@ -1,0 +1,15 @@
+services:
+  xui:
+    image: {{ xui_image }}
+    container_name: x-ui
+    hostname: {{ xui_hostname }}
+    volumes:
+      - ~/{{ xui_directory }}/db/:/etc/x-ui/
+      - ~/{{ xui_directory }}/config:/usr/share/xray
+      - /etc/letsencrypt/live/{{ xui_hostname }}/:/root/cert/live/current_host:ro
+      - /etc/letsencrypt/archive/{{ xui_hostname }}/:/root/cert/archive/{{ xui_hostname }}:ro
+    environment:
+      XRAY_VMESS_AEAD_FORCED: "false"
+    tty: true
+    network_mode: host
+    restart: unless-stopped

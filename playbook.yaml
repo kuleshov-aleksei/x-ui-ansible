@@ -1,0 +1,56 @@
+- name: Setup certbot
+  hosts: vps
+  become: true
+  vars:
+    certbot_install_method: snap
+    certbot_auto_renew: true
+    certbot_auto_renew_user: "root"
+    certbot_auto_renew_hour: "3"
+    certbot_auto_renew_minute: "30"
+    certbot_auto_renew_options: "--quiet"
+    certbot_admin_email: admin@encamy.com
+    certbot_create_if_missing: true
+    certbot_create_method: standalone
+    certbot_create_command: "{{ certbot_script }} certonly --standalone --noninteractive --agree-tos --email {{ cert_item.email | default(certbot_admin_email) }} -d {{ cert_item.domains | join(',') }}"
+    certbot_certs:
+      - email: admin@encamy.com
+        webroot: "/var/www/html"
+        domains:
+          - de.encamy.com
+  roles:
+    - prepare
+    - geerlingguy.certbot
+
+- name: Setup docker
+  hosts: vps
+  become: true
+  vars:
+    docker_edition: 'ce'
+    docker_obsolete_packages:
+      - docker
+      - docker.io
+      - docker-engine
+      - podman-docker
+      - containerd
+      - runc
+    docker_service_manage: true
+    docker_service_state: started
+    docker_service_enabled: true
+    docker_restart_handler_state: restarted
+    docker_install_compose_plugin: true
+    docker_compose_package: docker-compose-plugin
+    docker_compose_package_state: present
+  roles:
+    - geerlingguy.docker
+
+- name: Setup x-ui
+  hosts: vps
+  become: true
+  vars:
+    xui_image: "ghcr.io/alireza0/x-ui:1.8.6"
+    xui_hostname: de.encamy.com
+    xui_directory: x-ui
+  roles:
+    - xray
+
+

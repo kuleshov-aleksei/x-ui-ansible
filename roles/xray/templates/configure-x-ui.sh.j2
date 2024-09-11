@@ -1,0 +1,46 @@
+#!/bin/bash
+
+X_UI_DB=~/{{ xui_directory }}/db/x-ui.db
+X_RAY_CONFIG=~/{{ xui_directory }}/config/config.json
+
+# Wait x-ui to create db
+while [ ! -f "${X_UI_DB}" ]; do
+  sleep 1
+done
+
+PORT=$(( ( RANDOM % 52812 ) + 2048 ))
+PANEL_URL=$(head /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1)
+ADMIN_PASSWORD=$(head /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1)
+
+sqlite3 $X_UI_DB <<EOF
+	DELETE FROM "settings" WHERE ( "key"="webPort" ) OR ( "key"="webCertFile" ) OR ( "key"="webKeyFile" ) OR ( "key"="webBasePath" ); 
+	INSERT INTO "settings" ("key", "value") VALUES ("webPort", "${PORT}");
+	INSERT INTO "settings" ("key", "value") VALUES ("webCertFile", "/root/cert/live/current_host/fullchain.pem");
+	INSERT INTO "settings" ("key", "value") VALUES ("webKeyFile", "/root/cert/live/current_host/privkey.pem");
+	INSERT INTO "settings" ("key", "value") VALUES ("webBasePath", "${PANEL_URL}");
+
+	DELETE FROM "settings" WHERE ( "key"="tgBotEnable" ) OR ( "key"="tgBotToken" ) OR ( "key"="tgBotChatId" ) OR ( "key"="tgRunTime" ) OR ( "key"="tgBotBackup" ) OR ( "key"="tgBotLoginNotify" ) OR ( "key"="tgCpu" ); 
+	INSERT INTO "settings" ("key", "value") VALUES ("tgBotEnable", "true");
+	INSERT INTO "settings" ("key", "value") VALUES ("tgBotToken", "{{ xui_telegram_api_token }}");
+	INSERT INTO "settings" ("key", "value") VALUES ("tgBotChatId", "{{ xui_telegram_admin_chat_id }}");
+	INSERT INTO "settings" ("key", "value") VALUES ("tgRunTime", "@monthly");
+	INSERT INTO "settings" ("key", "value") VALUES ("tgBotBackup", "false");
+	INSERT INTO "settings" ("key", "value") VALUES ("tgBotLoginNotify", "true");
+	INSERT INTO "settings" ("key", "value") VALUES ("tgCpu", "true");
+
+    UPDATE "users" SET "password" = "$ADMIN_PASSWORD" WHERE "username" = "admin" AND "password" = "admin";
+EOF
+
+ADMIN_PASSWORD=$(sqlite3 -list $X_UI_DB 'SELECT "password" FROM "users" LIMIT 1;' 2>&1)
+
+ALREADY_CONFIGURED=$(sqlite3 -list $X_UI_DB 'SELECT 1 FROM "settings" WHERE "key" = "xrayTemplateConfig" LIMIT 1;' 2>&1)
+if [ ! "$ALREADY_CONFIGURED" ]; then
+    CONFIG=$(cat $X_RAY_CONFIG)
+
+    sqlite3 $X_UI_DB <<EOF
+        INSERT INTO "settings" ("key", "value") VALUES ("xrayTemplateConfig", '$CONFIG');
+EOF
+fi
+
+echo "https://{{ xui_hostname }}:$PORT/$PANEL_URL"
+echo "Login admin. Password $ADMIN_PASSWORD"

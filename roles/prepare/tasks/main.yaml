@@ -1,0 +1,13 @@
+- name: Install packages
+  apt:
+    pkg:
+      - nano
+      - htop
+      - iperf3
+      - sqlite3
+    state: latest
+    update_cache: true
+
+- name: Install cron (Debian).
+  apt: name=cron state=present
+  when: ansible_os_family == 'Debian'

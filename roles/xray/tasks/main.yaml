@@ -1,0 +1,35 @@
+- name: Create x-ui directory
+  file:
+    path: "~/{{ xui_directory }}/config"
+    state: directory
+
+- name: Prepare docker-compose
+  ansible.builtin.template:
+    src: templates/docker-compose.j2
+    dest: ~/{{ xui_directory }}/docker-compose.yaml
+
+- name: Prepare x-ui config
+  ansible.builtin.template:
+    src: templates/x-config.j2
+    dest: ~/{{ xui_directory }}/config/config.json
+
+- name: Start Docker services
+  community.docker.docker_compose_v2:
+    project_src: ~/{{ xui_directory }}/
+
+- name: Prepare x-ui configuration script
+  template:
+    src: templates/configure-x-ui.sh.j2
+    dest: ~/{{ xui_directory }}/configure-x-ui.sh
+    mode: '0755'
+
+- name: Configure x-ui
+  command: ~/{{ xui_directory }}/configure-x-ui.sh
+  register: config_output
+
+- debug: msg="{{ config_output.stdout.split('\n') }}"
+
+- name: Restart x-ui
+  community.docker.docker_compose_v2:
+    project_src: ~/{{ xui_directory }}/
+    state: restarted
