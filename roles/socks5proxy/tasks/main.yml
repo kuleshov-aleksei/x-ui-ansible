@@ -1,0 +1,13 @@
+- name: Create socks directory
+  file:
+    path: "~/{{ socks_directory }}"
+    state: directory
+
+- name: Prepare docker-compose
+  ansible.builtin.template:
+    src: templates/docker-compose.j2
+    dest: ~/{{ socks_directory }}/docker-compose.yaml
+
+- name: Start Docker services
+  community.docker.docker_compose_v2:
+    project_src: ~/{{ socks_directory }}/

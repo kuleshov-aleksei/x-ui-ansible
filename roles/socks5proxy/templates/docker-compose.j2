@@ -1,0 +1,11 @@
+services:
+  socks5:
+    image: {{ socks_image }}
+    container_name: socks-proxy
+    environment:
+      PROXY_USER: {{ socks_username }}
+      PROXY_PASSWORD: {{ socks_password }}
+      PROXY_PORT: 1080
+    ports:
+      - {{ socks_port }}:1080
+    restart: unless-stopped

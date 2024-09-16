@@ -53,4 +53,13 @@
   roles:
     - xray
 
+- name: Setup socks5 proxy
+  hosts: vps
+  become: true
+  vars:
+    socks_image: "serjs/go-socks5-proxy:latest"
+    socks_directory: socks5
+    socks_port: 47261
+  roles:
+    - socks5proxy
 

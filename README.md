@@ -27,6 +27,8 @@ Change variables inside of `playbook.yml`. Especially `xui_hostname` and certbot
 | certbot_certs.email | your email address |
 | certbot_certs.domains | your domain |
 | xui_hostname | your domain |
+| socks_username (inside secrets file) | username for socks5 proxy |
+| socks_password (inside secrets file) | password for socks5 proxy |
 
 Change inventory in `inventory.ini`: fill IP address of your VPS
 
