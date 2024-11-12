@@ -1,0 +1,23 @@
+- name: Create nginx directory
+  file:
+    path: "~/{{ nginx_directory }}/config"
+    state: directory
+
+- name: Prepare docker-compose
+  ansible.builtin.template:
+    src: templates/docker-compose.j2
+    dest: ~/{{ nginx_directory }}/docker-compose.yaml
+
+- name: Prepare nginx config
+  ansible.builtin.template:
+    src: templates/nginx.conf.j2
+    dest: ~/{{ nginx_directory }}/config/nginx.conf
+
+- name: Start Docker services
+  community.docker.docker_compose_v2:
+    project_src: ~/{{ nginx_directory }}/
+
+- name: Restart nginx
+  community.docker.docker_compose_v2:
+    project_src: ~/{{ nginx_directory }}/
+    state: restarted

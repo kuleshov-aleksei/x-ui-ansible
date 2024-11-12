@@ -1,0 +1,12 @@
+services:
+  nginx:
+    image: {{ nginx_image }}
+    container_name: nginx
+    ports:
+      - 8001:8001
+      - 8000:8000
+    volumes:
+      - ~/{{ nginx_directory }}/config/nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt/live/{{ nginx_hostname }}/:/root/cert/live/current_host:ro
+      - /etc/letsencrypt/archive/{{ nginx_hostname }}/:/root/cert/archive/{{ nginx_hostname }}:ro
+    restart: unless-stopped

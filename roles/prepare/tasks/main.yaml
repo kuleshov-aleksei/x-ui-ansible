@@ -5,6 +5,7 @@
       - htop
       - iperf3
       - sqlite3
+      - net-tools
     state: latest
     update_cache: true
 

@@ -43,6 +43,17 @@
   roles:
     - geerlingguy.docker
 
+- name: Setup nginx
+  hosts: vps
+  become: true
+  vars:
+    nginx_hostname: de.encamy.com
+    nginx_directory: nginx-server
+    nginx_image: "nginx:1.27.2"
+    nginx_upstream_website: www.omfgdogs.com
+  roles:
+    - nginx
+
 - name: Setup x-ui
   hosts: vps
   become: true
