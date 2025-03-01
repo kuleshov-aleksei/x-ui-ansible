@@ -9,14 +9,15 @@
     certbot_auto_renew_minute: "30"
     certbot_auto_renew_options: "--quiet"
     certbot_admin_email: admin@encamy.com
+    certbot_create_extra_args: ""
     certbot_create_if_missing: true
     certbot_create_method: standalone
-    certbot_create_command: "{{ certbot_script }} certonly --standalone --noninteractive --agree-tos --email {{ cert_item.email | default(certbot_admin_email) }} -d {{ cert_item.domains | join(',') }}"
+    certbot_create_command: "{{ certbot_script }} certonly --standalone --noninteractive --key-type ecdsa --agree-tos --email {{ cert_item.email | default(certbot_admin_email) }} -d {{ cert_item.domains | join(',') }}"
     certbot_certs:
       - email: admin@encamy.com
         webroot: "/var/www/html"
         domains:
-          - de.encamy.com
+          - uk.encamy.com
   roles:
     - prepare
     - geerlingguy.certbot
@@ -47,7 +48,7 @@
   hosts: vps
   become: true
   vars:
-    nginx_hostname: de.encamy.com
+    nginx_hostname: uk.encamy.com
     nginx_directory: nginx-server
     nginx_image: "nginx:1.27.2"
     nginx_upstream_website: www.omfgdogs.com
@@ -59,7 +60,7 @@
   become: true
   vars:
     xui_image: "ghcr.io/alireza0/x-ui:1.8.6"
-    xui_hostname: de.encamy.com
+    xui_hostname: uk.encamy.com
     xui_directory: x-ui
   roles:
     - xray
