@@ -43,7 +43,7 @@ Set up secrets for telegram:
 Run playbook:
 
 ```
-ansible-playbook -i inventory.ini playbook.yaml -e @secrets_file.enc --ask-vault-pass --tags="requirements,configure-xray"
+ansible-playbook -i inventory.ini playbook.yaml -e @secrets_file.enc --ask-vault-pass --tags="requirements,nginx,configure-xray"
 ```
 
 You will be asked for password. Use password for encrypted secrets storage
