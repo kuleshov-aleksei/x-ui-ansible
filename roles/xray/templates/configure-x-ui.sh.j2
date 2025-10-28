@@ -16,8 +16,8 @@ fi
 
 # If panel url not set - generate random prefix
 PANEL_URL=$(sqlite3 -list $X_UI_DB 'SELECT "value" FROM "settings" WHERE "key" = "webBasePath";' 2>&1)
-if [ "$PANEL_URL" = "/" ] || [ -z "$PANEL_URL" ]; then
-	PANEL_URL=$(head /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1)
+if [[ $PANEL_URL != /panel* ]]; then
+	PANEL_URL="/panel$(head /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1)"
 fi
 
 # If password not set - generate strong random password
@@ -56,5 +56,5 @@ if [ ! "$ALREADY_CONFIGURED" ]; then
 EOF
 fi
 
-echo "https://{{ xui_hostname }}:$PORT/$PANEL_URL"
+echo "https://{{ xui_hostname }}:${PORT}${PANEL_URL}"
 echo "Login admin. Password $ADMIN_PASSWORD"

@@ -67,7 +67,7 @@
   hosts: vps
   become: true
   vars:
-    xui_image: "ghcr.io/alireza0/x-ui:1.8.6"
+    xui_image: "ghcr.io/alireza0/x-ui:1.9.1"
     xui_hostname: de.encamy.com
     xui_directory: x-ui
   roles:
