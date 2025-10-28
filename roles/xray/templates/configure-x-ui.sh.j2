@@ -40,7 +40,7 @@ sqlite3 $X_UI_DB <<EOF
 	INSERT INTO "settings" ("key", "value") VALUES ("tgRunTime", "@monthly");
 	INSERT INTO "settings" ("key", "value") VALUES ("tgBotBackup", "true");
 	INSERT INTO "settings" ("key", "value") VALUES ("tgBotLoginNotify", "true");
-	INSERT INTO "settings" ("key", "value") VALUES ("tgCpu", 70);
+	INSERT INTO "settings" ("key", "value") VALUES ("tgCpu", "70");
 
     UPDATE "users" SET "password" = "$ADMIN_PASSWORD" WHERE "username" = "admin" AND "password" = "admin";
 EOF
