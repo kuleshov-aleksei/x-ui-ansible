@@ -1,0 +1,8 @@
+services:
+  speedtest:
+    image: {{ openspeedtest_image }}
+    container_name: speedtest-server
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+      - '3001:3001'

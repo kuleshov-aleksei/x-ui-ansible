@@ -19,7 +19,7 @@
       - email: admin@encamy.com
         webroot: "/var/www/html"
         domains:
-          - de.encamy.com
+          - duck.encamy.com
   tags:
     - requirements
   roles:
@@ -54,7 +54,7 @@
   hosts: vps
   become: true
   vars:
-    nginx_hostname: de.encamy.com
+    nginx_hostname: duck.encamy.com
     nginx_directory: nginx-server
     nginx_image: "nginx:1.27.2"
     nginx_upstream_website: www.omfgdogs.com
@@ -68,7 +68,7 @@
   become: true
   vars:
     xui_image: "ghcr.io/alireza0/x-ui:1.9.1"
-    xui_hostname: de.encamy.com
+    xui_hostname: duck.encamy.com
     xui_directory: x-ui
   roles:
     - xray
@@ -86,3 +86,24 @@
     - socks5proxy
   tags:
     - configure-socks5
+
+- name: Setup openspeedtest
+  hosts: vps
+  become: true
+  vars:
+    openspeedtest_image: "openspeedtest/latest:v2.0.6"
+    openspeedtest_directory: openspeedtest
+  roles:
+    - speedtest
+  tags:
+    - debug
+
+- name: Decomission openspeedtest
+  hosts: vps
+  become: true
+  vars:
+    openspeedtest_directory: openspeedtest
+  roles:
+    - speedtest_teardown
+  tags:
+    - stop_debug

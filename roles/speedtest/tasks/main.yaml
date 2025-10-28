@@ -1,0 +1,13 @@
+- name: Create open speedtest directory
+  file:
+    path: "~/{{ openspeedtest_directory }}/"
+    state: directory
+
+- name: Prepare docker-compose
+  ansible.builtin.template:
+    src: templates/docker-compose.j2
+    dest: ~/{{ openspeedtest_directory }}/docker-compose.yaml
+
+- name: Start Docker services
+  community.docker.docker_compose_v2:
+    project_src: ~/{{ openspeedtest_directory }}/

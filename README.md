@@ -70,3 +70,23 @@ If nothing loads, troubleshoot your setup. Otherwise, feel free to create client
 # Outbound configuration
 
 By default, all connections will exit from your node. Configure Cloudflare WARP if necessary
+
+# Debug
+
+There are some helpers that can be useful for connection debugging like `iperf3` and `OpenSpeedTest`
+
+Install some usefull stuff for checking remote server like [OpenSpeedTest](https://github.com/openspeedtest/Speed-Test) using tag `debug`:
+
+```
+ansible-playbook -i inventory.ini playbook.yaml -e @secrets_file.enc --ask-vault-pass --tags="debug"
+```
+
+Then, open http://my.domain.com:3000/ or https://my.domain.com:3001/
+
+**Warning**: do not leave container running if you don't want to waste bandwidth (this endpoint can be discovered by anyone on the ethernet)
+
+Use tag `stop_debug` to clean up open speed test
+
+```
+ansible-playbook -i inventory.ini playbook.yaml -e @secrets_file.enc --ask-vault-pass --tags="stop_debug"
+```
