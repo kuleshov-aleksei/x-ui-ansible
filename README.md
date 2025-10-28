@@ -2,6 +2,8 @@
 
 This is an opionated installation procedure for x-ui using ansible
 
+Playbook is made for `Ubuntu 22.04.2 LTS`, probably it should work with later versions
+
 This playbook:
 - Installs some tools like htop, iperf3, etc...
 - Installs and configures certbot for automatic cert renewal
