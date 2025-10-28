@@ -8,13 +8,27 @@ while [ ! -f "${X_UI_DB}" ]; do
   sleep 1
 done
 
-PORT=$(( ( RANDOM % 52812 ) + 2048 ))
-PANEL_URL=$(head /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1)
-ADMIN_PASSWORD=$(head /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1)
+# If panel port not set - generate random port
+PORT=$(sqlite3 -list $X_UI_DB 'SELECT "value" FROM "settings" WHERE "key" = "webPort";' 2>&1)
+if [ "$PORT" = "54321" ] || [ -z "$PORT" ]; then
+	PORT=$(( ( RANDOM % 52812 ) + 2048 ))
+fi
+
+# If panel url not set - generate random prefix
+PANEL_URL=$(sqlite3 -list $X_UI_DB 'SELECT "value" FROM "settings" WHERE "key" = "webBasePath";' 2>&1)
+if [ "$PANEL_URL" = "/" ] || [ -z "$PANEL_URL" ]; then
+	PANEL_URL=$(head /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1)
+fi
+
+# If password not set - generate strong random password
+ADMIN_PASSWORD=$(sqlite3 -list $X_UI_DB 'SELECT "password" FROM "users" LIMIT 1;' 2>&1)
+if [ "$ADMIN_PASSWORD" = "admin" ]; then
+	ADMIN_PASSWORD=$(head /dev/urandom | tr -dc '[:alnum:]' | fold -w 32 | head -n 1)
+fi
 
 sqlite3 $X_UI_DB <<EOF
 	DELETE FROM "settings" WHERE ( "key"="webPort" ) OR ( "key"="webCertFile" ) OR ( "key"="webKeyFile" ) OR ( "key"="webBasePath" ); 
-	INSERT INTO "settings" ("key", "value") VALUES ("webPort", "${PORT}");
+	INSERT INTO "settings" ("key", "value") VALUES ("webPort", ${PORT});
 	INSERT INTO "settings" ("key", "value") VALUES ("webCertFile", "/root/cert/live/current_host/fullchain.pem");
 	INSERT INTO "settings" ("key", "value") VALUES ("webKeyFile", "/root/cert/live/current_host/privkey.pem");
 	INSERT INTO "settings" ("key", "value") VALUES ("webBasePath", "${PANEL_URL}");
@@ -24,9 +38,9 @@ sqlite3 $X_UI_DB <<EOF
 	INSERT INTO "settings" ("key", "value") VALUES ("tgBotToken", "{{ xui_telegram_api_token }}");
 	INSERT INTO "settings" ("key", "value") VALUES ("tgBotChatId", "{{ xui_telegram_admin_chat_id }}");
 	INSERT INTO "settings" ("key", "value") VALUES ("tgRunTime", "@monthly");
-	INSERT INTO "settings" ("key", "value") VALUES ("tgBotBackup", "false");
+	INSERT INTO "settings" ("key", "value") VALUES ("tgBotBackup", "true");
 	INSERT INTO "settings" ("key", "value") VALUES ("tgBotLoginNotify", "true");
-	INSERT INTO "settings" ("key", "value") VALUES ("tgCpu", "true");
+	INSERT INTO "settings" ("key", "value") VALUES ("tgCpu", 70);
 
     UPDATE "users" SET "password" = "$ADMIN_PASSWORD" WHERE "username" = "admin" AND "password" = "admin";
 EOF
