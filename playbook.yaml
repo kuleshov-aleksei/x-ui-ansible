@@ -12,12 +12,16 @@
     certbot_create_extra_args: ""
     certbot_create_if_missing: true
     certbot_create_method: standalone
+    certbot_hsts: true
+    certbot_create_standalone_stop_services: []
     certbot_create_command: "{{ certbot_script }} certonly --standalone --noninteractive --key-type ecdsa --agree-tos --email {{ cert_item.email | default(certbot_admin_email) }} -d {{ cert_item.domains | join(',') }}"
     certbot_certs:
       - email: admin@encamy.com
         webroot: "/var/www/html"
         domains:
-          - uk.encamy.com
+          - de.encamy.com
+  tags:
+    - requirements
   roles:
     - prepare
     - geerlingguy.certbot
@@ -43,16 +47,20 @@
     docker_compose_package_state: present
   roles:
     - geerlingguy.docker
+  tags:
+    - requirements
 
 - name: Setup nginx
   hosts: vps
   become: true
   vars:
-    nginx_hostname: uk.encamy.com
+    nginx_hostname: de.encamy.com
     nginx_directory: nginx-server
     nginx_image: "nginx:1.27.2"
     nginx_upstream_website: www.omfgdogs.com
   roles:
+    - nginx
+  tags:
     - nginx
 
 - name: Setup x-ui
@@ -60,10 +68,12 @@
   become: true
   vars:
     xui_image: "ghcr.io/alireza0/x-ui:1.8.6"
-    xui_hostname: uk.encamy.com
+    xui_hostname: de.encamy.com
     xui_directory: x-ui
   roles:
     - xray
+  tags:
+    - configure-xray
 
 - name: Setup socks5 proxy
   hosts: vps
@@ -74,4 +84,5 @@
     socks_port: 47261
   roles:
     - socks5proxy
-
+  tags:
+    - configure-socks5
