@@ -52,3 +52,19 @@ Panel url and credentials will be shown in the output of the ansible script:
 
 Panel should be fully ready to configure inbounds. Select your desired domain for masking and start using VPN :)
 
+# Inbounds configuration
+
+Configure inbounds according to your preferences. Some tips while configuring vless:
+- Use reality
+- Set `destination` to `my.domain.com:8001` - nginx should listen on this port and provide a valid TLS certificate (self-stealing)
+- DO NOT SET DESTINATION TO `my.domain.com:443` - you will get packet loop
+- Set `SNI` to current `my.domain.com`
+
+Check your domain after inbound configuration (`https://my.domain.com` - https, default ssl port)
+Working page with a website from `nginx_upstream_website` should be able to load
+
+If nothing loads, troubleshoot your setup. Otherwise, feel free to create clients
+
+# Outbound configuration
+
+By default, all connections will exit from your node. Configure Cloudflare WARP if necessary
